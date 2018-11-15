@@ -28,6 +28,11 @@ traps<- read_csv("lobster_traps.csv")
 
 ```
 
+Other things to do/consider:
+1. Boxplots
+2. Incorporating absolute differences to talk about for some of the tests
+3. Look at facet wrap unfinished graphs for #3- not positive all are "normal"-- maybe run a mann-whitney test for this one and t-tests (student's or welch's) for the others??
+4. Error bars and letters over the bars in the graphs?
 
 ```{r}
 
