@@ -313,20 +313,22 @@ legal_size <- lobster_data %>%
       SIZE > 82.6 ~ "yes"
     )
   ) %>%
-  count(SIZE, lobster_data) %>%
-  spread(lobster_data) %>%
-  select(-YEAR) 
+  count(SITE, SIZE) %>%
+  spread(SIZE, n) %>% 
+  select(-SITE)
+   
 
-row_names
+rownames(legal_size)<- c("AQUE", "CARP", "IVEE", "MOHK", "NAPL")
 
 # B. Make the table look pretty, use kable
 
 # C. Make the prop table
-prop2_lob <- prop.table(as.matrix(prep_prop_lob), 1)
+prop2_lob <- prop.table(as.matrix(legal_size), 1)
 
 #D. Run the chi-square test.
 
-
+lob_x2 <- chisq.test(prop2_lob)
+lob_x2
 
  
 ```
