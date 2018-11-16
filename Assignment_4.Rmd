@@ -33,6 +33,7 @@ Other things to do/consider:
 2. Incorporating absolute differences to talk about for some of the tests
 3. Look at facet wrap unfinished graphs for #3- not positive all are "normal"-- maybe run a mann-whitney test for this one and t-tests (student's or welch's) for the others??
 4. Error bars and letters over the bars in the graphs?
+5. Figure captions/table captions/legend line graph
 
 ```{r}
 
@@ -89,6 +90,7 @@ ab_scatter<- as.data.frame(lobster_ab) %>%
   count(YEAR, SITE) %>% 
   ggplot(aes(x= YEAR, y=n)) +
   geom_line(aes(color=SITE), size=0.5) +
+  geom_point() +
   theme_classic()+ 
   scale_y_continuous(breaks= seq(0,750, by= 100), expand= c(0,0))+
   labs(x= "Year", y= "Lobster abdundance")+
@@ -158,11 +160,13 @@ lobster_levene
 
 lobster_aov <- aov(SIZE ~ SITE, data=lobster_data)
 summary(lobster_aov)
+#significant p-value = 0.0085
 
 #post hoc testing- let's do Tukey's HSD.
 lobster_ph <- TukeyHSD(lobster_aov)
 
 lobster_ph
+#Significant difference between Naples & Carp, and Naples & IV
 
 ```
 

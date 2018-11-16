@@ -34,6 +34,8 @@ Other things to do/consider:
 3. Look at facet wrap unfinished graphs for #3- not positive all are "normal"-- maybe run a mann-whitney test for this one and t-tests (student's or welch's) for the others??
 4. Error bars and letters over the bars in the graphs?
 5. Graph for #1-- need to make captions, fix legend labels, etc
+6. Look at number 3 for normality (distribution)- do we need to do mann-whitney u tests for any of them?
+
 
 ```{r}
 
@@ -189,6 +191,21 @@ summary(lobster_aov)
 lobster_ph <- TukeyHSD(lobster_aov)
 
 lobster_ph
+
+
+#This is the code for the graph which will show differences between specific locations (i.e. little letters above box/columns (whatever we decide to do))
+figure2 <- ggplot(stats, aes(x = reach, y = Mean)) +
+  geom_col(colour = NA, fill = "gray50", width = 0.5) +
+  geom_errorbar(aes(ymax = Mean + SD, ymin = Mean - SD), width = 0.1) +
+  scale_y_continuous(expand = c(0,0), limits = c(0,1.5)) +
+  labs(y=expression(Mean~Sediment~Bulk~Density~(g/cm^{"3"}))) +
+  scale_x_discrete(labels = c("Reach A","Reach B","Reach C","Reach D")) +
+  xlab("\nRiver Reach") +
+  geom_signif(y_position = c(1.0, 1.2), xmin = c(1,1), xmax = c(2,3), annotation = c("p = 0.032","p = 0.046"), tip_length = 0.1, size = 0.5, textsize = 3) +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+        panel.background = element_blank(), axis.line = element_line(colour = "black"))
+  
+  figure2
 
 ```
 
