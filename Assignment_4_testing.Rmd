@@ -276,7 +276,7 @@ f_napl <- var.test(napl12_df$SIZE, napl17_df$SIZE)
 f_napl
 
 napl_ttest <- t.test(napl12_df$SIZE, napl17_df$SIZE)
-napl_ttest
+napl_ttest 
 
 #to-do list: create grouped column graphs for each site!
 
