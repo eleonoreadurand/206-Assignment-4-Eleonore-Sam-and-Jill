@@ -58,7 +58,7 @@ lobster_data <- as.data.frame(lobster_ab) %>%
 lobster_tidy<- as.data.frame(lobster_ab) %>% 
   expand.dft(freq="COUNT")  
 
-#Create tidy DF, then create a table that shows means and variances 
+#Create tidy DF, then create a table that shows means and variances in 2017 
 lobster_new <- as.data.frame(lobster_ab) %>% 
   expand.dft(freq="COUNT") %>% 
   filter(YEAR == "2017") %>% 
@@ -199,9 +199,7 @@ ReachC <- rnorm(24, mean = 0.9, sd = 0.2)
 set.seed(24)
 ReachD <- rnorm(24, mean = 0.95, sd = 0.2)
 
-df <- data.frame(ReachA, ReachB, ReachC, ReachD) #how do we know the order?
-stack_df <- stack(df)
-colnames(stack_df) <- c("site","size")
+
 
 #2. Run one-way ANOVA
 
@@ -218,14 +216,13 @@ lobster_ph <- TukeyHSD(lobster_aov)
 
 lobster_ph
 
-<<<<<<< HEAD
 #3. Make ANOVA table
 
-aov_table <- xtable(lobster_aov, caption = 'Mean lobster size ANOVA results summary.')
+#Edit: aov_table <- data.frame(???), caption = 'Mean lobster size ANOVA results summary.')
 print(table, comment = FALSE, caption.placement = "top")
 
-aov_summary <- stack_df %>% 
-  group_by(reach) %>% 
+#edit aov_summary <- ???? %>% 
+  group_by(SITE) %>% 
   summarize(Mean = round(mean(density),2), SD = round(sd(density),2))
 
 #4. Make column graph with error bars and letter differences to show ANOVA results
@@ -236,26 +233,16 @@ aov_graph <- ggplot(lobster_aov, aes(x = SITE, y = SIZE)) +
   scale_y_continuous(expand = c(0,0), limits = c(0,1.2)) +
   labs(y=expression(Mean~Lobster~Size(mm))) +
   scale_x_discrete(labels = c("Isla Vista","Carpinteria","Mohawk","Naples","Arroyo Quemado")) +
-  xlab("\nSite")
-
+  xlab("\nSite") +
+   annotate("text", x = 2, y = 0.92, label = "a", family = "Times New Roman") +
+  annotate("text", x = 3, y = 1.09, label = "a,b", family = "Times New Roman") +
+  annotate("text", x = 4, y = 1.14, label = "b", family = "Times New Roman") +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+        panel.background = element_blank(), axis.line = element_line(colour = "black"),text = element_text(family = "Times New Roman"))
   
 aov_graph
-=======
 
-#This is the code for the graph which will show differences between specific locations (i.e. little letters above box/columns (whatever we decide to do))
-figure2 <- ggplot(stats, aes(x = reach, y = Mean)) +
-  geom_col(colour = NA, fill = "gray50", width = 0.5) +
-  geom_errorbar(aes(ymax = Mean + SD, ymin = Mean - SD), width = 0.1) +
-  scale_y_continuous(expand = c(0,0), limits = c(0,1.5)) +
-  labs(y=expression(Mean~Sediment~Bulk~Density~(g/cm^{"3"}))) +
-  scale_x_discrete(labels = c("Reach A","Reach B","Reach C","Reach D")) +
-  xlab("\nRiver Reach") +
-  geom_signif(y_position = c(1.0, 1.2), xmin = c(1,1), xmax = c(2,3), annotation = c("p = 0.032","p = 0.046"), tip_length = 0.1, size = 0.5, textsize = 3) +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-        panel.background = element_blank(), axis.line = element_line(colour = "black"))
-  
-  figure2
->>>>>>> 523ba0a05f8eb09cd3aaa3c854bac816dc831d20
+aov_graph
 
 ```
 
