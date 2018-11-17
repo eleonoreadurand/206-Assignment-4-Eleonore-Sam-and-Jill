@@ -33,9 +33,7 @@ Other things to do/consider:
 2. Incorporating absolute differences to talk about for some of the tests
 3. Look at facet wrap unfinished graphs for #3- not positive all are "normal"-- maybe run a mann-whitney test for this one and t-tests (student's or welch's) for the others??
 4. Error bars and letters over the bars in the graphs?
-5. Graph for #1-- need to make captions, fix legend labels, etc
-6. Look at number 3 for normality (distribution)- do we need to do mann-whitney u tests for any of them?
-
+5. Figure captions/table captions/legend line graph
 
 ```{r}
 
@@ -92,37 +90,13 @@ ab_scatter<- as.data.frame(lobster_ab) %>%
   count(YEAR, SITE) %>% 
   ggplot(aes(x= YEAR, y=n)) +
   geom_line(aes(color=SITE), size=0.5) +
+  geom_point() +
   theme_classic()+ 
   scale_y_continuous(breaks= seq(0,750, by= 100), expand= c(0,0))+
   labs(x= "Year", y= "Lobster abdundance")+
   ggtitle("Variations in Lobster Abundance, 2012-2017")
   
 
-#seeing if data is normal
-ab_hist <-ggplot(lobster_tidy,aes(x=SIZE)) +
-  geom_histogram() +
-  facet_wrap(~ SITE)+
-  theme_classic()
-
-ab_hist
-
-ab_qq <-as.data.frame(lobster_ab) %>% 
-  expand.dft(freq="COUNT") %>% 
-  count(YEAR, SITE) %>% 
-  ggplot(aes(sample=n)) +
-  geom_qq() +
-  facet_wrap(~ SITE, scale="free")+
-  theme_classic()
-
-#All of these, except maybe  Carp, look normally distributed for both the histograms and the qqplots.
-
-ab_qq2 <-ggplot(lobster_tidy,aes(sample=SIZE)) +
-  geom_qq() +
-  facet_wrap(~ SITE, scale="free")+
-  theme_classic()
-
-ab_qq
-ab_qq2
 ab_scatter
 
 #1, Part 2 (Pressure on )
@@ -144,7 +118,7 @@ rownames(pressure_trend)<- c ("2012", "2013", "2014", "2015", "2016", "2017")
 
 pressure_trend
 
-#Make the table look good #MISSING 3 SITES NAMES!!
+#Make the table look good #missing 3 site names!!
 
 pressure_table_pretty <- pressure_trend %>% 
   kable(align= "c", col.names = c("Arroyo Quemado", "Carpinteria", "Goleta Beach", "Isla Vista", "Mohawk Reef", "Naples Reef")) %>% 
@@ -156,8 +130,8 @@ pressure_scatter<- as.data.frame(traps) %>%
   expand.dft(freq="TRAPS") %>% 
   count(YEAR, SITE) %>% 
   ggplot(aes(x= YEAR, y=n)) +
-  geom_point() +
   geom_line(aes(color= SITE)) +
+  geom_point() +
   scale_y_continuous(breaks= seq(0,1400, by= 200), expand= c(0,0))+
   theme_classic()+
   labs(x= "Year", y= "Number of traps")+
@@ -186,114 +160,19 @@ lobster_levene
 
 lobster_aov <- aov(SIZE ~ SITE, data=lobster_data)
 summary(lobster_aov)
+#significant p-value = 0.0085
 
 #post hoc testing- let's do Tukey's HSD.
 lobster_ph <- TukeyHSD(lobster_aov)
 
 lobster_ph
-
-
-#This is the code for the graph which will show differences between specific locations (i.e. little letters above box/columns (whatever we decide to do))
-figure2 <- ggplot(stats, aes(x = reach, y = Mean)) +
-  geom_col(colour = NA, fill = "gray50", width = 0.5) +
-  geom_errorbar(aes(ymax = Mean + SD, ymin = Mean - SD), width = 0.1) +
-  scale_y_continuous(expand = c(0,0), limits = c(0,1.5)) +
-  labs(y=expression(Mean~Sediment~Bulk~Density~(g/cm^{"3"}))) +
-  scale_x_discrete(labels = c("Reach A","Reach B","Reach C","Reach D")) +
-  xlab("\nRiver Reach") +
-  geom_signif(y_position = c(1.0, 1.2), xmin = c(1,1), xmax = c(2,3), annotation = c("p = 0.032","p = 0.046"), tip_length = 0.1, size = 0.5, textsize = 3) +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-        panel.background = element_blank(), axis.line = element_line(colour = "black"))
-  
-  figure2
+#Significant difference between Naples & Carp, and Naples & IV
 
 ```
 
 ```{r}
 
 #Part 3. 
-aque12_df <- lobster_tidy %>% 
-  filter (YEAR ==2012,SITE== "AQUE") %>% 
-  select(YEAR, SIZE)
-
-aque17_df <- lobster_tidy %>% 
-  filter (YEAR ==2017,SITE== "AQUE") %>% 
-  select(YEAR, SIZE)
-
-f_test <- var.test(aque12_df$SIZE, aque17_df$SIZE)
-#variances are equal (retain the null because p= 0.29)
-f_test
-
-aque_ttest <- t.test(aque12_df$SIZE, aque17_df$SIZE)
-aque_ttest
-
-#next site: CARP
-
-carp12_df <- lobster_tidy %>% 
-  filter (YEAR ==2012,SITE== "CARP") %>% 
-  select(YEAR, SIZE)
-
-carp17_df <- lobster_tidy %>% 
-  filter (YEAR ==2017,SITE== "CARP") %>% 
-  select(YEAR, SIZE)
-
-f_carp <- var.test(carp12_df$SIZE, carp17_df$SIZE)
-#variances are equal (retain the null because p= 0.22)
-f_carp
-
-carp_ttest <- t.test(carp12_df$SIZE, carp17_df$SIZE)
-carp_ttest
-
-#NEXT SITE: IVEE
-
-ivee12_df <- lobster_tidy %>% 
-  filter (YEAR ==2012,SITE== "IVEE") %>% 
-  select(YEAR, SIZE)
-
-ivee17_df <- lobster_tidy %>% 
-  filter (YEAR ==2017,SITE== "IVEE") %>% 
-  select(YEAR, SIZE)
-
-f_ivee <- var.test(ivee12_df$SIZE, ivee17_df$SIZE)
-#variances are equal (retain the null because p= 0.31)
-f_ivee
-
-ivee_ttest <- t.test(carp12_df$SIZE, carp17_df$SIZE)
-ivee_ttest
-
-# Next SITE: MOHK 
-
-mohk12_df <- lobster_tidy %>% 
-  filter (YEAR ==2012,SITE== "MOHK") %>% 
-  select(YEAR, SIZE)
-
-mohk17_df <- lobster_tidy %>% 
-  filter (YEAR ==2017,SITE== "MOHK") %>% 
-  select(YEAR, SIZE)
-
-f_mohk <- var.test(mohk12_df$SIZE, mohk17_df$SIZE)
-#variances are equal (retain the null because p= 0.15)
-f_mohk
-
-mohk_ttest <- t.test(mohk12_df$SIZE, mohk17_df$SIZE)
-mohk_ttest
-#there is a significant difference 
-
-#Last Site: NAPL
-napl12_df <- lobster_tidy %>% 
-  filter (YEAR ==2012,SITE== "NAPL") %>% 
-  select(YEAR, SIZE)
-
-napl17_df <- lobster_tidy %>% 
-  filter (YEAR ==2017,SITE== "NAPL") %>% 
-  select(YEAR, SIZE)
-
-f_napl <- var.test(napl12_df$SIZE, napl17_df$SIZE)
-#variances are equal (retain the null because p= 0.77)
-f_napl
-
-napl_ttest <- t.test(napl12_df$SIZE, napl17_df$SIZE)
-napl_ttest 
 
 #to-do list: create grouped column graphs for each site!
 
@@ -330,22 +209,20 @@ legal_size <- lobster_data %>%
       SIZE > 82.6 ~ "yes"
     )
   ) %>%
-  count(SITE, SIZE) %>%
-  spread(SIZE, n) %>% 
-  select(-SITE)
-   
+  count(SIZE, lobster_data) %>%
+  spread(lobster_data) %>%
+  select(-YEAR) 
 
-rownames(legal_size)<- c("AQUE", "CARP", "IVEE", "MOHK", "NAPL")
+row_names
 
 # B. Make the table look pretty, use kable
 
 # C. Make the prop table
-prop2_lob <- prop.table(as.matrix(legal_size), 1)
+prop2_lob <- prop.table(as.matrix(prep_prop_lob), 1)
 
 #D. Run the chi-square test.
 
-lob_x2 <- chisq.test(prop2_lob)
-lob_x2
+
 
  
 ```
