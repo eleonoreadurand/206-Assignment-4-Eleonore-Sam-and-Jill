@@ -341,6 +341,14 @@ napl_ttest
 
 #to-do list: create grouped column graphs for each site!- Figure 4
 
+column_years_twelve_seventeen <- lobster_tidy %>% 
+  filter(YEAR == 2012 | YEAR == 2017)
+
+grouped_column <- ggplot(column_years_twelve_seventeen, aes(SITE, fill = YEAR, y = SIZE)) + 
+  geom_bar(position = "dodge", stat="identity")
+
+grouped_column
+
 #Ideas: 
 # A.ANOVA- nope, dont do this. We are only testing by site, so it's two groups exactly
 
