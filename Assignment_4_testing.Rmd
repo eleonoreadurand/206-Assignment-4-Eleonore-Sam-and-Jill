@@ -19,6 +19,7 @@ library(car)
 library(onewaytests)
 library(kableExtra)
 library(ggsignif)
+library(effsize)
 
 #Read in original (untidy) data files
 
@@ -41,6 +42,7 @@ Other things to do/consider:
 4. Error bars and letters over the bars in the graphs?
 5. Graph for #1-- need to make captions, fix legend labels, etc
 6. Look at number 3 for normality (distribution)- do we need to do mann-whitney u tests for any of them?
+7. Effect size
 
 >>>>>>> 523ba0a05f8eb09cd3aaa3c854bac816dc831d20
 
@@ -175,7 +177,7 @@ pressure_scatter
 
 ```
 
-```{r}
+```{r ANOVA_table, echo = FALSE, results = 'asis', message = FALSE}
 
 #Problem 2. 
 
