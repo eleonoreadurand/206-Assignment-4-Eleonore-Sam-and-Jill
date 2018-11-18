@@ -58,7 +58,8 @@ lobster_new <- as.data.frame(lobster_ab) %>%
   group_by(SITE) %>% 
   summarize(
     mean_lobster_size = round(mean(SIZE), 1),
-    var_lobster_size=round(var(SIZE))
+    var_lobster_size=round(var(SIZE)),
+    sd_lobster=round(sd(SIZE),1)
   )
 
 
@@ -192,10 +193,15 @@ lobster_ph <- TukeyHSD(lobster_aov)
 
 lobster_ph
 
+aov_lob_graph <- ggplot(lobster_new, aes( x=SITE, y=mean_lobster_size)) +
+  geom_col(width= 0.5) +
+  geom_errorbar(aes(ymin= mean_lobster_size-sd_lobster, ymax= mean_lobster_size+sd_lobster), width= 0.3, size=0.8) +
+  theme_classic()
 
+aov_lob_graph
 #This is the code for the graph which will show differences between specific locations (i.e. little letters above box/columns (whatever we decide to do))
 figure2 <- ggplot(stats, aes(x = reach, y = Mean)) +
-  geom_col(colour = NA, fill = "gray50", width = 0.5) +
+  geom_col(colour = NA, fill = "gray50", width = 0.2) +
   geom_errorbar(aes(ymax = Mean + SD, ymin = Mean - SD), width = 0.1) +
   scale_y_continuous(expand = c(0,0), limits = c(0,1.5)) +
   labs(y=expression(Mean~Sediment~Bulk~Density~(g/cm^{"3"}))) +
