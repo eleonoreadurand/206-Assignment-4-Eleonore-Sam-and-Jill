@@ -157,10 +157,12 @@ pressure_trend
 #Make the table look good #MISSING 3 SITES NAMES!!
 
 pressure_table_pretty <- pressure_trend %>% 
-  kable(align= "c", col.names = c("Arroyo Quemado", "Carpinteria", "Goleta Beach", "Isla Vista", "Mohawk Reef", "Naples Reef")) %>% 
+  kable(align= "c", col.names = c("Arroyo Burro Reef", "Arroyo Hondo Reef", "Arroyo Hondo Reef to Arroyo Quemado Reef", "Arroyo Quemado Reef", "Carpinteria Reef", "Goleta Bay Reef", "Isla Vista Reef", "Mohawk Reef", "Naples Reef")) %>% 
   kable_styling(bootstrap_options = c("striped", "hover"),
                 full_width = FALSE) %>% 
-  add_header_above(c("", "Lobster Count at Sites, 2012-2017 "=5), escape= FALSE)
+  add_header_above(c("", "Lobster Fishing Pressure at Sites, 2012-2017 "=9), escape= FALSE)
+
+pressure_table_pretty
 
 pressure_scatter<- as.data.frame(traps) %>% 
   expand.dft(freq="TRAPS") %>% 
@@ -219,17 +221,6 @@ lobster_ph <- TukeyHSD(lobster_aov)
 
 lobster_ph
 
-<<<<<<< HEAD
-aov_lob_graph <- ggplot(lobster_new, aes( x=SITE, y=mean_lobster_size)) +
-  geom_col(width= 0.5) +
-  geom_errorbar(aes(ymin= mean_lobster_size-sd_lobster, ymax= mean_lobster_size+sd_lobster), width= 0.3, size=0.8) +
-  theme_classic()
-
-aov_lob_graph
-#This is the code for the graph which will show differences between specific locations (i.e. little letters above box/columns (whatever we decide to do))
-figure2 <- ggplot(stats, aes(x = reach, y = Mean)) +
-  geom_col(colour = NA, fill = "gray50", width = 0.2) +
-=======
 #3. Make ANOVA table
 
 #Edit: aov_table <- data.frame(???), caption = 'Mean lobster size ANOVA results summary.')
@@ -238,27 +229,31 @@ print(table, comment = FALSE, caption.placement = "top")
 #edit aov_summary <- ???? %>% 
   group_by(SITE) %>% 
   summarize(Mean = round(mean(density),2), SD = round(sd(density),2))
-  
 
 #4. Make column graph with error bars and letter differences to show ANOVA results
+aov_lob_graph <- ggplot(lobster_new, aes( x=SITE, y=mean_lobster_size)) +
+  geom_col(width= 0.5) +
+  geom_errorbar(aes(ymin= mean_lobster_size-sd_lobster, ymax= mean_lobster_size+sd_lobster), width= 0.3, size=0.8) +
+  annotate("text", label= "a,b", x="AQUE", y=90) +
+  annotate("text", label= "b", x="CARP", y=90) +
+  annotate("text", label= "b", x="IVEE", y=90) +
+  annotate("text", label= "a,b", x="MOHK", y=86) +
+  annotate("text", label= "a", x="NAPL", y=93) +
+  scale_x_discrete(expand= c(0,0))+
+  scale_y_continuous(limits= c(0,100), breaks= seq(0,100, by= 10), expand= c(0,0)) +
+  theme_classic()
 
-aov_graph <- ggplot(lobster_aov, aes(x = SITE, y = SIZE)) +
-  geom_col(colour = NA, fill = "gray50", width = 0.5) +
->>>>>>> eaa2803ecd4f6113186d84b84029879b70c9dc08
-  geom_errorbar(aes(ymax = Mean + SD, ymin = Mean - SD), width = 0.1) +
-  scale_y_continuous(expand = c(0,0), limits = c(0,1.2)) +
-  labs(y=expression(Mean~Lobster~Size(mm))) +
-  scale_x_discrete(labels = c("Isla Vista","Carpinteria","Mohawk","Naples","Arroyo Quemado")) +
-  xlab("\nSite") +
-   annotate("text", x = 2, y = 0.92, label = "a", family = "Times New Roman") +
-  annotate("text", x = 3, y = 1.09, label = "a,b", family = "Times New Roman") +
-  annotate("text", x = 4, y = 1.14, label = "b", family = "Times New Roman") +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-        panel.background = element_blank(), axis.line = element_line(colour = "black"),text = element_text(family = "Times New Roman"))
+aov_lob_graph
+#This is the code for the graph which will show differences between specific locations (i.e. little letters above box/columns (whatever we decide to do))
+figure2 <- ggplot(stats, aes(x = reach, y = Mean)) +
+  geom_col(colour = NA, fill = "gray50", width = 0.2) +
+
+
   
-aov_graph
 
-aov_graph
+
+
+
 
 ```
 
@@ -277,7 +272,7 @@ f_test <- var.test(aque12_df$SIZE, aque17_df$SIZE)
 #variances are equal (retain the null because p= 0.29)
 f_test
 
-aque_ttest <- t.test(aque12_df$SIZE, aque17_df$SIZE)
+aque_ttest <- t.test(aque12_df$SIZE, aque17_df$SIZE, var.equal = TRUE)
 aque_ttest
 
 #next site: CARP
@@ -294,7 +289,7 @@ f_carp <- var.test(carp12_df$SIZE, carp17_df$SIZE)
 #variances are equal (retain the null because p= 0.22)
 f_carp
 
-carp_ttest <- t.test(carp12_df$SIZE, carp17_df$SIZE)
+carp_ttest <- t.test(carp12_df$SIZE, carp17_df$SIZE, var.equal = TRUE)
 carp_ttest
 
 #NEXT SITE: IVEE
@@ -311,7 +306,7 @@ f_ivee <- var.test(ivee12_df$SIZE, ivee17_df$SIZE)
 #variances are equal (retain the null because p= 0.31)
 f_ivee
 
-ivee_ttest <- t.test(carp12_df$SIZE, carp17_df$SIZE)
+ivee_ttest <- t.test(carp12_df$SIZE, carp17_df$SIZE, var.equal = TRUE)
 ivee_ttest
 
 # Next SITE: MOHK 
@@ -328,7 +323,7 @@ f_mohk <- var.test(mohk12_df$SIZE, mohk17_df$SIZE)
 #variances are equal (retain the null because p= 0.15)
 f_mohk
 
-mohk_ttest <- t.test(mohk12_df$SIZE, mohk17_df$SIZE)
+mohk_ttest <- t.test(mohk12_df$SIZE, mohk17_df$SIZE, var.equal = TRUE)
 mohk_ttest
 #there is a significant difference 
 
@@ -349,7 +344,7 @@ f_napl <- var.test(napl12_df$SIZE, napl17_df$SIZE)
 #variances are equal (retain the null because p= 0.77)
 f_napl
 
-napl_ttest <- t.test(napl12_df$SIZE, napl17_df$SIZE)
+napl_ttest <- t.test(napl12_df$SIZE, napl17_df$SIZE, var.equal = TRUE)
 napl_ttest 
 
 #to-do list: create grouped column graphs for each site!
@@ -383,8 +378,8 @@ napl_ttest
 legal_size <- lobster_data %>%
     mutate(
      SIZE = case_when(
-      SIZE <= 82.6 ~ "no", 
-      SIZE > 82.6 ~ "yes"
+      SIZE <= 82.6 ~ "Below legal limit", 
+      SIZE > 82.6 ~ "Above legal limit"
     )
   ) %>%
   count(SITE, SIZE) %>%
@@ -397,7 +392,7 @@ rownames(legal_size)<- c("AQUE", "CARP", "IVEE", "MOHK", "NAPL")
 # B. Make the table look pretty, use kable
 
 # C. Make the prop table
-prop2_lob <- prop.table(as.matrix(legal_size), 1)
+prop2_lob <- prop.table (as.matrix(round(legal_size), 1))
 
 #D. Run the chi-square test.
 
