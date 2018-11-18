@@ -20,6 +20,7 @@ library(onewaytests)
 library(kableExtra)
 library(ggsignif)
 library(effsize)
+library(xtable)
 
 #Read in original (untidy) data files
 
@@ -33,18 +34,11 @@ traps<- read_csv("lobster_traps.csv")
 Other things to do/consider:
 1. Boxplots
 2. Incorporating absolute differences to talk about for some of the tests
-3. Look at facet wrap unfinished graphs for #3- not positive all are "normal"-- maybe run a mann-whitney test for this one and t-tests (student's or welch's) for the others??
-<<<<<<< HEAD
-4. Error bars and letters over the bars in the graphs in #2?
 5. Figure captions ALL
-5. Means table for ANOVA (#2, reference example online)
-=======
-4. Error bars and letters over the bars in the graphs?
 5. Graph for #1-- need to make captions, fix legend labels, etc
-6. Look at number 3 for normality (distribution)- do we need to do mann-whitney u tests for any of them?
-7. Effect size
 
->>>>>>> 523ba0a05f8eb09cd3aaa3c854bac816dc831d20
+
+
 
 ```{r}
 
@@ -86,6 +80,7 @@ rownames(lobster_ab_trend)<- c ("2012", "2013", "2014", "2015", "2016", "2017")
 #View table
 lobster_ab_trend
 
+options(knitr.kable.NA = "-")
 #Making the table pretty:
 ab_table_pretty <- lobster_ab_trend %>% 
   kable(align= "c", col.names = c("Arroyo Quemado", "Naples Reef", "Mohawk Reef", "Isla Vista", "Carpinteria")) %>% 
@@ -101,10 +96,11 @@ ab_scatter<- as.data.frame(lobster_ab) %>%
   expand.dft(freq="COUNT") %>% 
   count(YEAR, SITE) %>% 
   ggplot(aes(x= YEAR, y=n)) +
+  geom_point() +
   geom_line(aes(color=SITE), size=0.5) +
   theme_classic()+ 
   scale_y_continuous(breaks= seq(0,750, by= 100), expand= c(0,0))+
-  labs(x= "Year", y= "Lobster abdundance")+
+  labs(x= "Year", y= "Lobster Count")+
   ggtitle("Variations in Lobster Abundance, 2012-2017")
   
 
@@ -116,13 +112,6 @@ ab_hist <-ggplot(lobster_tidy,aes(x=SIZE)) +
 
 ab_hist
 
-ab_qq <-as.data.frame(lobster_ab) %>% 
-  expand.dft(freq="COUNT") %>% 
-  count(YEAR, SITE) %>% 
-  ggplot(aes(sample=n)) +
-  geom_qq() +
-  facet_wrap(~ SITE, scale="free")+
-  theme_classic()
 
 #All of these, except maybe  Carp, look normally distributed for both the histograms and the qqplots.
 
@@ -131,7 +120,6 @@ ab_qq2 <-ggplot(lobster_tidy,aes(sample=SIZE)) +
   facet_wrap(~ SITE, scale="free")+
   theme_classic()
 
-ab_qq
 ab_qq2
 ab_scatter
 
@@ -155,7 +143,7 @@ rownames(pressure_trend)<- c ("2012", "2013", "2014", "2015", "2016", "2017")
 pressure_trend
 
 #Make the table look good #MISSING 3 SITES NAMES!!
-
+options(knitr.kable.NA = "-")
 pressure_table_pretty <- pressure_trend %>% 
   kable(align= "c", col.names = c("Arroyo Burro Reef", "Arroyo Hondo Reef", "Arroyo Hondo Reef to Arroyo Quemado Reef", "Arroyo Quemado Reef", "Carpinteria Reef", "Goleta Bay Reef", "Isla Vista Reef", "Mohawk Reef", "Naples Reef")) %>% 
   kable_styling(bootstrap_options = c("striped", "hover"),
@@ -193,17 +181,6 @@ lobster_levene
 
 #Next step: more prep for showing the ANOVA in our results
 
-#1. Make stacked DF
-
-set.seed(24)
-ReachA <- rnorm(24, mean = 0.4, sd = 0.15)
-set.seed(24)
-ReachB <- rnorm(24, mean = 0.8, sd = 0.1)
-set.seed(24)
-ReachC <- rnorm(24, mean = 0.9, sd = 0.2)
-set.seed(24)
-ReachD <- rnorm(24, mean = 0.95, sd = 0.2)
-
 
 
 #2. Run one-way ANOVA
@@ -222,18 +199,22 @@ lobster_ph <- TukeyHSD(lobster_aov)
 lobster_ph
 
 #3. Make ANOVA table
+options(knitr.kable.NA = "-")
 
-#Edit: aov_table <- data.frame(???), caption = 'Mean lobster size ANOVA results summary.')
-print(table, comment = FALSE, caption.placement = "top")
+table <- xtable(lobster_aov) %>% 
+   kable(align= "c", col.names = c("Df", "Sum Sq", "Mean Sq", "F Value", "Pr(>F)"), digits= 2) %>% 
+  kable_styling(bootstrap_options = c("striped", "hover"),
+                full_width = FALSE) %>% 
+  add_header_above(c("", "Mean lobster size ANOVA results summary "=5), escape= FALSE)
 
-#edit aov_summary <- ???? %>% 
-  group_by(SITE) %>% 
-  summarize(Mean = round(mean(density),2), SD = round(sd(density),2))
+ table
+
 
 #4. Make column graph with error bars and letter differences to show ANOVA results
 aov_lob_graph <- ggplot(lobster_new, aes( x=SITE, y=mean_lobster_size)) +
-  geom_col(width= 0.5) +
+  geom_col(fill="coral4", color="royalblue4", width= 0.5) +
   geom_errorbar(aes(ymin= mean_lobster_size-sd_lobster, ymax= mean_lobster_size+sd_lobster), width= 0.3, size=0.8) +
+  labs(x = "Site", y= "Average Carapace Length (mm)") +
   annotate("text", label= "a,b", x="AQUE", y=90) +
   annotate("text", label= "b", x="CARP", y=90) +
   annotate("text", label= "b", x="IVEE", y=90) +
@@ -244,12 +225,11 @@ aov_lob_graph <- ggplot(lobster_new, aes( x=SITE, y=mean_lobster_size)) +
   theme_classic()
 
 aov_lob_graph
-#This is the code for the graph which will show differences between specific locations (i.e. little letters above box/columns (whatever we decide to do))
-figure2 <- ggplot(stats, aes(x = reach, y = Mean)) +
-  geom_col(colour = NA, fill = "gray50", width = 0.2) +
 
 
   
+
+ 
 
 
 
@@ -392,7 +372,7 @@ rownames(legal_size)<- c("AQUE", "CARP", "IVEE", "MOHK", "NAPL")
 # B. Make the table look pretty, use kable
 
 # C. Make the prop table
-prop2_lob <- prop.table (as.matrix(round(legal_size), 1))
+prop2_lob <- prop.table (as.matrix(legal_size), 1)
 
 #D. Run the chi-square test.
 
