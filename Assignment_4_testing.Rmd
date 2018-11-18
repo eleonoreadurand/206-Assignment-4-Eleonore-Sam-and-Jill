@@ -318,6 +318,10 @@ mohk_ttest <- t.test(mohk12_df$SIZE, mohk17_df$SIZE)
 mohk_ttest
 #there is a significant difference 
 
+#find effect size here! is it correct to call the SIZE variable?  
+mohawk_eff <- cohen.d(mohk12_df$SIZE, mohk17_df$SIZE)
+mohawk_eff
+
 #Last Site: NAPL
 napl12_df <- lobster_tidy %>% 
   filter (YEAR ==2012,SITE== "NAPL") %>% 
