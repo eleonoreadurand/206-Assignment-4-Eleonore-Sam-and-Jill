@@ -1,7 +1,7 @@
 ---
 title: "assignment 4 test"
-author: "Eleonore Durand"
-date: "November 13, 2018"
+author: "Eleonore Durand, Sam Smith, Jill Wirt"
+date: "November 21, 2018"
 output: html_document
 ---
 
@@ -18,6 +18,8 @@ library(vcdExtra)
 library(car)
 library(onewaytests)
 library(kableExtra)
+library(ggsignif)
+library(effsize)
 
 #Read in original (untidy) data files
 
@@ -32,10 +34,17 @@ Other things to do/consider:
 1. Boxplots
 2. Incorporating absolute differences to talk about for some of the tests
 3. Look at facet wrap unfinished graphs for #3- not positive all are "normal"-- maybe run a mann-whitney test for this one and t-tests (student's or welch's) for the others??
+<<<<<<< HEAD
+4. Error bars and letters over the bars in the graphs in #2?
+5. Figure captions ALL
+5. Means table for ANOVA (#2, reference example online)
+=======
 4. Error bars and letters over the bars in the graphs?
 5. Graph for #1-- need to make captions, fix legend labels, etc
 6. Look at number 3 for normality (distribution)- do we need to do mann-whitney u tests for any of them?
+7. Effect size
 
+>>>>>>> 523ba0a05f8eb09cd3aaa3c854bac816dc831d20
 
 ```{r}
 
@@ -51,7 +60,7 @@ lobster_data <- as.data.frame(lobster_ab) %>%
 lobster_tidy<- as.data.frame(lobster_ab) %>% 
   expand.dft(freq="COUNT")  
 
-#Create tidy DF, then create a table that shows means and variances 
+#Create tidy DF, then create a table that shows means and variances in 2017 
 lobster_new <- as.data.frame(lobster_ab) %>% 
   expand.dft(freq="COUNT") %>% 
   filter(YEAR == "2017") %>% 
@@ -169,9 +178,9 @@ pressure_scatter
 
 ```
 
-```{r}
+```{r ANOVA_table, echo = FALSE, results = 'asis', message = FALSE}
 
-#2. 
+#Problem 2. 
 
 #First- we think we want to do an ANOVA. So, we will do the Levene's Test to test for equal variances.
 
@@ -179,6 +188,23 @@ lobster_levene <-leveneTest(SIZE ~ SITE, data=lobster_data)
 lobster_levene
 
 #Result of Levene's test: variances are NOT equal, BUTTTTT largest variance is less than 4times the smallest variance, so we can still do ANOVA. Yay!
+
+#Next step: more prep for showing the ANOVA in our results
+
+#1. Make stacked DF
+
+set.seed(24)
+ReachA <- rnorm(24, mean = 0.4, sd = 0.15)
+set.seed(24)
+ReachB <- rnorm(24, mean = 0.8, sd = 0.1)
+set.seed(24)
+ReachC <- rnorm(24, mean = 0.9, sd = 0.2)
+set.seed(24)
+ReachD <- rnorm(24, mean = 0.95, sd = 0.2)
+
+
+
+#2. Run one-way ANOVA
 
 #ANOVA overview:
 #single factor: SITE
@@ -193,6 +219,7 @@ lobster_ph <- TukeyHSD(lobster_aov)
 
 lobster_ph
 
+<<<<<<< HEAD
 aov_lob_graph <- ggplot(lobster_new, aes( x=SITE, y=mean_lobster_size)) +
   geom_col(width= 0.5) +
   geom_errorbar(aes(ymin= mean_lobster_size-sd_lobster, ymax= mean_lobster_size+sd_lobster), width= 0.3, size=0.8) +
@@ -202,16 +229,36 @@ aov_lob_graph
 #This is the code for the graph which will show differences between specific locations (i.e. little letters above box/columns (whatever we decide to do))
 figure2 <- ggplot(stats, aes(x = reach, y = Mean)) +
   geom_col(colour = NA, fill = "gray50", width = 0.2) +
-  geom_errorbar(aes(ymax = Mean + SD, ymin = Mean - SD), width = 0.1) +
-  scale_y_continuous(expand = c(0,0), limits = c(0,1.5)) +
-  labs(y=expression(Mean~Sediment~Bulk~Density~(g/cm^{"3"}))) +
-  scale_x_discrete(labels = c("Reach A","Reach B","Reach C","Reach D")) +
-  xlab("\nRiver Reach") +
-  geom_signif(y_position = c(1.0, 1.2), xmin = c(1,1), xmax = c(2,3), annotation = c("p = 0.032","p = 0.046"), tip_length = 0.1, size = 0.5, textsize = 3) +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-        panel.background = element_blank(), axis.line = element_line(colour = "black"))
+=======
+#3. Make ANOVA table
+
+#Edit: aov_table <- data.frame(???), caption = 'Mean lobster size ANOVA results summary.')
+print(table, comment = FALSE, caption.placement = "top")
+
+#edit aov_summary <- ???? %>% 
+  group_by(SITE) %>% 
+  summarize(Mean = round(mean(density),2), SD = round(sd(density),2))
   
-  figure2
+
+#4. Make column graph with error bars and letter differences to show ANOVA results
+
+aov_graph <- ggplot(lobster_aov, aes(x = SITE, y = SIZE)) +
+  geom_col(colour = NA, fill = "gray50", width = 0.5) +
+>>>>>>> eaa2803ecd4f6113186d84b84029879b70c9dc08
+  geom_errorbar(aes(ymax = Mean + SD, ymin = Mean - SD), width = 0.1) +
+  scale_y_continuous(expand = c(0,0), limits = c(0,1.2)) +
+  labs(y=expression(Mean~Lobster~Size(mm))) +
+  scale_x_discrete(labels = c("Isla Vista","Carpinteria","Mohawk","Naples","Arroyo Quemado")) +
+  xlab("\nSite") +
+   annotate("text", x = 2, y = 0.92, label = "a", family = "Times New Roman") +
+  annotate("text", x = 3, y = 1.09, label = "a,b", family = "Times New Roman") +
+  annotate("text", x = 4, y = 1.14, label = "b", family = "Times New Roman") +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+        panel.background = element_blank(), axis.line = element_line(colour = "black"),text = element_text(family = "Times New Roman"))
+  
+aov_graph
+
+aov_graph
 
 ```
 
@@ -284,6 +331,10 @@ f_mohk
 mohk_ttest <- t.test(mohk12_df$SIZE, mohk17_df$SIZE)
 mohk_ttest
 #there is a significant difference 
+
+#find effect size here! is it correct to call the SIZE variable?  
+mohawk_eff <- cohen.d(mohk12_df$SIZE, mohk17_df$SIZE)
+mohawk_eff
 
 #Last Site: NAPL
 napl12_df <- lobster_tidy %>% 
