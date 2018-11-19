@@ -349,6 +349,9 @@ column_years_twelve_seventeen <- lobster_tidy %>%
 SITE=c("AQUE","CARP","IVEE", "MOHK", "NAPL")
 YEAR=c("2012", "2017")
 
+lob_2012 <- as.data.frame(lobster_ab) %>% 
+  expand.dft(freq="COUNT") %>% 
+  filter(YEAR == "2012")
 
 grouped_column <- ggplot(column_years_twelve_seventeen, aes(x = SITE , y = SIZE)) + 
   geom_bar(aes(fill = YEAR), position = "dodge",  stat="identity", show.legend = FALSE)+
