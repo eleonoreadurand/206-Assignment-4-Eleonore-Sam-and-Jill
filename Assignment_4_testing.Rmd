@@ -102,11 +102,11 @@ ab_scatter<- as.data.frame(lobster_ab) %>%
   geom_line(aes(color=SITE), size=0.5) +
   theme_classic()+ 
   scale_y_continuous(breaks= seq(0,750, by= 100), expand= c(0,0))+
-  labs(x= "Year", y= "Lobster Count")+ # Figure 1 INSERT CAPTION HERE
+  labs(x= "Year", y= "Lobster Count", caption = str_wrap(c("Figure 1: California spiny lobster abundance by site in years 2012 to 2017.")))+ # Figure 1 INSERT CAPTION HERE
   scale_color_manual(labels= c("Arroyo Quemado", "Carpinteria", "Isla Vista", "Mohawk", "Naples"), values= c("cornflowerblue", "firebrick4", "darkolivegreen", "lightpink2", "gold1")) +
   ggtitle("Variations in Lobster Abundance, 2012-2017") +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-        panel.background = element_blank(), axis.line = element_line(colour = "black"),text = element_text(family = "Times New Roman"))
+        panel.background = element_blank(), axis.line = element_line(colour = "black"),text = element_text(family = "Times New Roman"), plot.caption=element_text(size=10, hjust=0, margin=margin(t=15)))
   
 
 #seeing if data is normal
@@ -165,11 +165,11 @@ pressure_scatter<- as.data.frame(traps) %>%
   geom_line(aes(color= SITE)) +
   scale_y_continuous(breaks= seq(0,1400, by= 200), expand= c(0,0))+
   theme_classic()+
-  labs(x= "Year", y= "Number of traps")+ # Figure 2 INSERT CAPTION HERE
-  scale_color_manual(labels= c("Arroyo Burro Reef", "Arroyo Hondo Reef", "Arroyo Hondo Reef to Arroyo Quemado Reef", "Arroyo Quemado Reef", "Carpinteria Reef", "Goleta Bay Reef", "Isla Vista Reef", "Mohawk Reef", "Naples Reef"), values= c("gold1", "plum3", "chocolate2", "cornflowerblue", "firebrick4", "darkolivegreen", "lightpink2", "darkslategrey")) +
+  labs(x= "Year", y= "Number of traps", caption = str_wrap(c("Figure 2: Lobster fishing pressure by site in years 2012 to 2017.")))+ # Figure 2 INSERT CAPTION HERE
+  scale_color_manual(labels= c("Arroyo Burro Reef", "Arroyo Hondo Reef", "Arroyo Hondo Reef to \nArroyo Quemado Reef", "Arroyo Quemado Reef", "Carpinteria Reef", "Goleta Bay Reef", "Isla Vista Reef", "Mohawk Reef", "Naples Reef"), values= c("gold1", "plum3", "chocolate2", "cornflowerblue", "firebrick4", "darkolivegreen", "lightpink2", "darkslategrey")) +
   ggtitle("Lobster Fishing Pressure, 2012-2017") +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-        panel.background = element_blank(), axis.line = element_line(colour = "black"),text = element_text(family = "Times New Roman"))
+        panel.background = element_blank(), axis.line = element_line(colour = "black"),text = element_text(family = "Times New Roman"), plot.caption=element_text(size=10, hjust=0, margin=margin(t=15)))
   
 pressure_scatter
 
@@ -223,7 +223,7 @@ table <- xtable(lobster_aov) %>%
 aov_lob_graph <- ggplot(lobster_new, aes( x=SITE, y=mean_lobster_size)) +
   geom_col(fill="coral4", color="royalblue4", width= 0.5) +
   geom_errorbar(aes(ymin= mean_lobster_size-sd_lobster, ymax= mean_lobster_size+sd_lobster), width= 0.3, size=0.8) +
-  labs(x = "Site", y= "Average Carapace Length (mm)", caption = str_wrap(c("Figure 3: Lobster sizes at five research sites. Mean lobster size (mm) for Isla Vista, Naples, Mohawk, Arroyo Quemado, and Carpinteria (n = 1668 for each) in the Santa Barbara Channel. Error bars indicate +/- 1 standard deviation. Like letters indicate values that do not differ significantly (by one-way ANOVA with Tukey’s HSD; F(3.94) = 85.0, p= 0.009), with α = 0.05 for all post-hoc pairwise comparisons)."), width = 100)) +
+  labs(x = "Site", y= "Average Carapace Length (mm)", caption = str_wrap(c("Figure 3: Lobster sizes at five research sites. Mean lobster size (mm) for Isla Vista, Naples, Mohawk, Arroyo Quemado, and Carpinteria (n = 1668 for each) in the Santa Barbara Channel. Error bars indicate +/- 1 standard deviation. Like letters indicate values that do not differ significantly (by one-way ANOVA with Tukey’s HSD; F(4,1663) =3.42, p= 0.01), with α = 0.05 for all post-hoc pairwise comparisons)."), width = 100)) +
   annotate("text", label= "a,b", x="AQUE", y=90, family = "Times New Roman") +
   annotate("text", label= "b", x="CARP", y=90, family = "Times New Roman") +
   annotate("text", label= "b", x="IVEE", y=90, family = "Times New Roman") +
@@ -240,13 +240,6 @@ aov_lob_graph
 
 
   
-
- 
-
-
-
-
-
 ```
 
 ```{r}
@@ -340,12 +333,19 @@ napl_ttest <- t.test(napl12_df$SIZE, napl17_df$SIZE, var.equal = TRUE)
 napl_ttest 
 
 #to-do list: create grouped column graphs for each site!- Figure 4
+library(reshape2)
 
 column_years_twelve_seventeen <- lobster_tidy %>% 
   filter(YEAR == 2012 | YEAR == 2017)
 
-grouped_column <- ggplot(column_years_twelve_seventeen, aes(SITE, fill = YEAR, y = SIZE)) + 
-  geom_bar(position = "dodge", stat="identity")
+SITE=c("AQUE","CARP","IVEE", "MOHK", "NAPL")
+YEAR=c("2012", "2017")
+
+
+grouped_column <- ggplot(column_years_twelve_seventeen, aes(x = SITE , y = SIZE)) + 
+  geom_bar(aes(fill = YEAR), position = "dodge",  stat="identity", show.legend = FALSE)+
+  facet_wrap(~YEAR) +
+  theme_classic() 
 
 grouped_column
 
