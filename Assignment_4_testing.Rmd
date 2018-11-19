@@ -26,7 +26,7 @@ library(stringr)
 
 lobster_ab <- read_csv("lobster_size_abundance.csv")
 traps<- read_csv("lobster_traps.csv")
-
+report_table<- read_csv("proptablepretty.csv")
 
 
 ```
@@ -409,6 +409,14 @@ rownames(legal_size)<- c("AQUE", "CARP", "IVEE", "MOHK", "NAPL")
 # C. Make the prop table
 prop2_lob <- prop.table (as.matrix(legal_size), 1) 
 
+final_table <- report_table %>% 
+  select("Site", "Above Legal Size", "Below Legal Size", "Total") %>% 
+  kable(align= "c", col.names = c("Site", "Above Legal Size", "Below Legal Size", "Total")) %>% 
+  kable_styling(bootstrap_options = c("striped", "hover"),
+                full_width = FALSE) %>% 
+  add_header_above(c("", "Table 4: Count and Proportion of Lobsters Above and Below the Legal Limit of 82.6 mm "=3), escape= FALSE)
+
+final_table
 #D. Run the chi-square test.
 
 lob_x2 <- chisq.test(prop2_lob)
